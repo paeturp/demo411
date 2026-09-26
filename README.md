@@ -5,21 +5,85 @@ This project targets the STM32F411CEU6-based Black Pill board (512 KiB flash,
 
 ## Build
 
-Before compiling, update `compile_path` in `cmake/toolchain_arm.cmake` to the
-location of the Arm GNU Toolchain on your system.
+The build expects the Arm GNU bare-metal tools (`arm-none-eabi-*`) on `PATH`.
+
+### macOS on Apple Silicon
+
+Install Homebrew first if it is not already available, then install CMake and
+Arm's complete embedded GCC distribution:
+
+```bash
+brew install cmake
+brew install --cask gcc-arm-embedded
+```
+
+Use the `gcc-arm-embedded` cask, not the similarly named
+`arm-none-eabi-gcc` formula. The formula contains the compiler but not the
+embedded C library and specs required by this project. No Rosetta installation
+is needed.
+
+Optional flashing tools:
+
+```bash
+brew install openocd       # for the OpenOCD command below
+# or
+brew install stlink        # for the st-flash command below
+```
+
+Verify the installation:
+
+```bash
+arm-none-eabi-gcc --version
+cmake --version
+```
+
+### Ubuntu/Debian
+
+Install the compiler, Newlib embedded C library, CMake, and Make:
+
+```bash
+sudo apt update
+sudo apt install cmake make gcc-arm-none-eabi libnewlib-arm-none-eabi
+```
+
+If the project gains C++ firmware sources, also install:
+
+```bash
+sudo apt install libstdc++-arm-none-eabi-newlib
+```
+
+Optional flashing tools:
+
+```bash
+sudo apt install openocd       # for the OpenOCD command below
+# or
+sudo apt install stlink-tools  # for the st-flash command below
+```
+
+Alternatively, install Arm's complete prebuilt `arm-none-eabi` toolchain for
+Linux and add its `bin` directory to `PATH`. The original setup used this style
+of package, for example
+`arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi`.
+
+### Compile
 
 ```bash
 ./scripts/build.sh -dceA
 ```
 
-The build produces `build/DemoRTOSProject.elf` and
-`build/DemoRTOSProject.bin`.
+The build produces `build/DemoRTOSProject.elf`, `.bin`, `.map`, and `.lst`.
 
 To build the project and run all unit-test:
 ```bash
 ./scripts/build.sh -dceAG
 ```
 
+
+## Run in QEMU
+
+See [the QEMU guide](doc/qemu.md) for building this firmware, selecting a custom
+Black Pill emulator, running the serial menu, and reading integration-test results.
+The launcher and integration test live in this project under `scripts/`.
 
 ## Flash with an ST-Link V2
 
@@ -112,13 +176,9 @@ raw binary does not contain its destination address.
 
 ## Build requirements
 
-ARM cross compiler e.g. arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi
-
-The toolchain can be downloaded from:
-```
-https://developer.arm.com/tools-and-software/gnu-toolchain
-```
-cmake version 3.20 or later
+- Arm GNU cross compiler providing `arm-none-eabi-gcc`, `g++`, `objcopy`,
+  `objdump`, and `size`
+- CMake 3.25 or later
 
 
 ## Directory tree

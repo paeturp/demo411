@@ -4,6 +4,7 @@
 #include "menu_util.h"
 
 #include "rtc.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <stdint.h>

@@ -16,9 +16,10 @@ buildDir="build"
 export GTEST_COLOR=1
 
 NP=1
-if [[ -e /proc/cpuinfo ]]
-then
-    NP=$(cat /proc/cpuinfo | grep ^processor | wc -l)
+if command -v nproc >/dev/null 2>&1; then
+    NP=$(nproc)
+elif command -v getconf >/dev/null 2>&1; then
+    NP=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
 fi
 
 die()
@@ -61,7 +62,7 @@ buildApp()
     makeBuildDir 2
 
     pushd ${buildDir}
-    make -j ${NP}
+    cmake --build . --parallel "${NP}"
     [[ $? -ne 0 ]] && die "ERR: failed to build project $(pwd)"
     popd
 

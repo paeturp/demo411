@@ -39,18 +39,24 @@ cmake --version
 
 ### Ubuntu/Debian
 
-Install the compiler, Newlib embedded C library, CMake, and Make:
+Install the Arm bare-metal compiler, embedded C/C++ libraries, Python,
+CMake, Make and Ninja:
 
-```bash
+```sh
 sudo apt update
-sudo apt install cmake make gcc-arm-none-eabi libnewlib-arm-none-eabi
+sudo apt install git cmake make ninja-build python3 gcc-arm-none-eabi \
+  libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 ```
 
-If the project gains C++ firmware sources, also install:
+The current CMake build also builds C++ test executables, so include the
+embedded C++ library even though the application firmware is written in C.
+CMake 3.25 or newer is required; check `cmake --version`. Ubuntu 24.04 or newer
+provides a suitable version. Older distributions may require a newer CMake.
 
-```bash
-sudo apt install libstdc++-arm-none-eabi-newlib
-```
+For running this firmware in the experimental Black Pill emulator, follow
+[the QEMU guide](doc/qemu.md). Its integration test uses Python's standard
+library and requires no pip packages. The Ubuntu instructions have not yet
+been validated on an Ubuntu host.
 
 Optional flashing tools:
 

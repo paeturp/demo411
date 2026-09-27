@@ -5,25 +5,58 @@ Standard QEMU releases do not provide this model. The emulator is an external
 build dependency: all firmware building, application launch and integration
 testing stay in this repository.
 
+## Ubuntu prerequisites
+
+Install the firmware build dependencies:
+
+```sh
+sudo apt update
+sudo apt install git cmake make ninja-build python3 gcc-arm-none-eabi \
+  libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+```
+
+CMake 3.25 or newer is required. Ubuntu 24.04 or newer supplies a suitable
+version; on older systems, install a newer CMake first. The embedded C++ library
+is needed because the current build also creates C++ test executables.
+See the [README](../README.md#build) for other platforms and toolchain options.
+
+Build the experimental QEMU fork separately, following its
+`docs/system/arm/blackpill.rst` instructions. Ubuntu needs no `--disable-pvg`
+option. Use the fork's `build/qemu-system-arm`, not a distribution QEMU binary
+without this board model. No system-wide QEMU installation is required.
+
+The following workflow has been tested on macOS; Ubuntu verification remains
+outstanding.
+
+## Build the firmware
+
 From this repository's root, configure a separate firmware build:
 
 ```sh
 cmake -S . -B build/qemu -G Ninja \
   -DCMAKE_TOOLCHAIN_FILE="$PWD/cmake/toolchain_arm.cmake"
-cmake --build build/qemu -j 10
+cmake --build build/qemu
 ```
 
 This uses the Arm GNU bare-metal toolchain described in the README and leaves
 any existing `build/DemoRTOSProject.elf` alone.
 
+## Run
+
 Select the custom emulator and run:
 
 ```sh
-export QEMU_SYSTEM_ARM=/Users/paetur/Work/qemu-experimental/build/qemu-system-arm
+export QEMU_SYSTEM_ARM=/absolute/path/to/qemu-experimental/build/qemu-system-arm
 ./scripts/run-demo411.sh
 ```
 
-`QEMU_SYSTEM_ARM` is configurable; replace that example path for your machine.
+`QEMU_SYSTEM_ARM` is configurable; replace the placeholder with the absolute
+path to your QEMU executable. Check that it contains the board before launching:
+
+```sh
+"$QEMU_SYSTEM_ARM" -machine help | grep blackpill-f411ce
+```
+
 If unset, the scripts look for `qemu-system-arm` on `PATH`. The launcher locates
 its own project directory, so it also works when invoked from another directory.
 Its default firmware is `build/qemu/DemoRTOSProject.elf` in this repository.
@@ -68,6 +101,9 @@ python3 scripts/test-demo411.py \
   --firmware build/qemu/DemoRTOSProject.elf \
   --output build/qemu-test
 ```
+
+This is the firmware integration test for the custom system emulator, separate
+from the project's existing CTest unit tests.
 
 The test uses Python's standard library and starts/stops its own QEMU instance.
 It exercises the firmware banner, command menu, time/date commands, RTC advance,

@@ -22,7 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     project = pathlib.Path(__file__).resolve().parent.parent
     parser.add_argument('--qemu', default=os.environ.get('QEMU_SYSTEM_ARM', 'qemu-system-arm'))
-    parser.add_argument('--firmware', default=str(project / 'build/qemu/DemoRTOSProject.elf'))
+    parser.add_argument('--firmware', default=str(project / 'build/DemoRTOSProject.elf'))
     parser.add_argument('--output', default=str(project / 'build/qemu-test'))
     args = parser.parse_args()
     qemu = shutil.which(args.qemu)

@@ -3,7 +3,7 @@
 set -eu
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 project_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
-firmware=${1:-"$project_dir/build/qemu/DemoRTOSProject.elf"}
+firmware=${1:-"$project_dir/build/DemoRTOSProject.elf"}
 if [ "$#" -gt 0 ]; then shift; fi
 qemu=${QEMU_SYSTEM_ARM:-qemu-system-arm}
 if ! command -v "$qemu" >/dev/null 2>&1; then
